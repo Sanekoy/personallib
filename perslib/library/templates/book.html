@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Просмотр книги: {{ book.title }}</title>
+</head>
+<body>
+    <h1>{{ book.title }}</h1>
+    <p><strong>Авторы:</strong> 
+        {% for author in book.authors.all %}
+            {{ author.name }}{% if not forloop.last %}, {% endif %}
+        {% endfor %}
+    </p>
+    <p><strong>Издательства:</strong> 
+        {% for publisher in book.publishers.all %}
+            {{ publisher.name }}{% if not forloop.last %}, {% endif %}
+        {% endfor %}
+    </p>
+    <p><strong>Жанры:</strong> 
+        {% for genre in book.genres.all %}
+            {{ genre.name }}{% if not forloop.last %}, {% endif %}
+        {% endfor %}
+    </p>
+    <p><strong>Метки:</strong> 
+        {% for tag in book.tags.all %}
+            {{ tag.name }}{% if not forloop.last %}, {% endif %}
+        {% endfor %}
+    </p>
+    <p><strong>Номер издания:</strong> {{ book.edition_number }}</p>
+    <p><strong>Комментарии:</strong> {{ book.comment }}</p>
+    
+    <h2>Фотографии</h2>
+    <div>
+        {% for photo in book.photos.all %}
+            <img src="{{ photo.image.url }}" alt="Фото книги">
+        {% endfor %}
+    </div>
+
+    <a href="{% url 'view_collection' book.collections.first.id %}">Назад к коллекции</a>
+</body>
+</html>

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Выберите Коллекцию</title>
+</head>
+<body>
+    <h1>Выберите Коллекцию</h1>
+
+    <h2>Создать новую коллекцию</h2>
+    <form method="post" action="{% url 'create_collection' %}">
+        {% csrf_token %}
+        <label for="collection_name">Название коллекции:</label>
+        <input type="text" id="collection_name" name="collection_name" required>
+        <button type="submit">Создать</button>
+    </form>
+
+    <h2>Выбрать существующую коллекцию</h2>
+    <ul>
+        {% for collection in collections %}
+            <li>
+                <a href="{% url 'view_collection' collection.id %}">{{ collection.name }}</a>
+            </li>
+        {% endfor %}
+    </ul>
+
+</body>
+</html>
