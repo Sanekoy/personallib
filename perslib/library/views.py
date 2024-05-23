@@ -1,7 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.db.models import Q
-from .models import Collection, Book, Author, Publisher, Genre, Tag
-from .forms import BookForm
+from .models import Collection, Book, Author, Publisher, Genre, Tag, Photo
+from .forms import BookForm, AuthorForm, PublisherForm, GenreForm, TagForm
+from django.urls import reverse
+from django.http import HttpResponseRedirect
 
 def choose_collection(request):
     if request.method == 'POST':
@@ -53,54 +54,146 @@ def view_collection(request, collection_id):
         'all_tags': all_tags,
     })
 
-def add_book(request, collection_id):
-    collection = get_object_or_404(Collection, id=collection_id)
-    all_books = Book.objects.all()
-    all_authors = Author.objects.all()
-    all_publishers = Publisher.objects.all()
-    all_genres = Genre.objects.all()
-    all_tags = Tag.objects.all()
-    all_collections = Collection.objects.all()
-
-    if request.method == "POST":
-        if 'new_book' in request.POST:
-            # Обработайте данные из HTML-формы
-            title = request.POST.get('title')
-            edition_number = request.POST.get('edition_number')
-            comment = request.POST.get('comment')
-            authors = request.POST.getlist('authors')
-            publishers = request.POST.getlist('publishers')
-            genres = request.POST.getlist('genres')
-            tags = request.POST.getlist('tags')
-            collections = request.POST.getlist('collections')
-
-            # Создайте новую книгу и сохраните ее в базе данных
-            new_book = Book.objects.create(title=title, edition_number=edition_number, comment=comment)
-            new_book.authors.set(authors)
-            new_book.publishers.set(publishers)
-            new_book.genres.set(genres)
-            new_book.tags.set(tags)
-            new_book.collections.set(collections)
-
-            collection.books.add(new_book)
-            return redirect('collection_detail', pk=collection.id)
-        else:
-            book_id = request.POST.get('book_id')
-            book = get_object_or_404(Book, id=book_id)
-            collection.books.add(book)
-            return redirect('collection_detail', pk=collection.id)
-
-    context = {
-        'collection': collection,
-        'all_books': all_books,
-        'all_authors': all_authors,
-        'all_publishers': all_publishers,
-        'all_genres': all_genres,
-        'all_tags': all_tags,
-        'all_collections': all_collections,
-    }
-    return render(request, 'add_book.html', context)
-
 def view_book(request, book_id):
     book = get_object_or_404(Book, pk=book_id)
     return render(request, 'book.html', {'book': book})
+
+def add_book(request, collection_id):
+    collection = get_object_or_404(Collection, id=collection_id)
+
+    if request.method == "POST":
+        book_form = BookForm(request.POST, request.FILES)
+        author_form = AuthorForm(request.POST)
+        publisher_form = PublisherForm(request.POST)
+        genre_form = GenreForm(request.POST)
+        tag_form = TagForm(request.POST)
+
+        if book_form.is_valid():
+            book = book_form.save(commit=False)
+            book.save()
+
+            photos = request.FILES.getlist('photos')
+            for photo in photos:
+                Photo.objects.create(book=book, image=photo)
+
+            collection.books.add(book)
+
+            # Обработка авторов
+            for author_id in request.POST.getlist('authors'):
+                try:
+                    author = Author.objects.get(id=author_id)
+                    book.authors.add(author)
+                except Author.DoesNotExist:
+                    pass
+
+            # Обработка издателей
+            for publisher_id in request.POST.getlist('publishers'):
+                try:
+                    publisher = Publisher.objects.get(id=publisher_id)
+                    book.publishers.add(publisher)
+                except Publisher.DoesNotExist:
+                    pass
+
+            # Обработка жанров
+            for genre_id in request.POST.getlist('genres'):
+                try:
+                    genre = Genre.objects.get(id=genre_id)
+                    book.genres.add(genre)
+                except Genre.DoesNotExist:
+                    pass
+
+            # Обработка тегов
+            for tag_id in request.POST.getlist('tags'):
+                try:
+                    tag = Tag.objects.get(id=tag_id)
+                    book.tags.add(tag)
+                except Tag.DoesNotExist:
+                    pass
+
+            return redirect('view_collection', collection_id=collection.id)
+
+    else:
+        initial_data = {
+            'title': request.GET.get('title'),
+            'edition_number': request.GET.get('edition_number'),
+            'comment': request.GET.get('comment'),
+        }
+        book_form = BookForm(initial=initial_data)
+        author_form = AuthorForm()
+        publisher_form = PublisherForm()
+        genre_form = GenreForm()
+        tag_form = TagForm()
+
+        context = {
+            'collection': collection,
+            'book_form': book_form,
+            'author_form': author_form,
+            'publisher_form': publisher_form,
+            'genre_form': genre_form,
+            'tag_form': tag_form,
+            'all_authors': Author.objects.all(),
+            'all_publishers': Publisher.objects.all(),
+            'all_genres': Genre.objects.all(),
+            'all_tags': Tag.objects.all(),
+        }
+        return render(request, 'add_book.html', context)
+
+def add_author(request, collection_id=None):
+    if request.method == "POST":
+        form = AuthorForm(request.POST)
+        if form.is_valid():
+            form.save()
+            collection_id = request.POST.get('collection_id')
+
+            if collection_id:
+                if 'save_and_add_new' in request.POST:
+                    return redirect('add_author', collection_id=collection_id)
+                else:
+                    # Перенаправляем на /library/collection/1/add_book/
+                    return redirect(reverse('add_book', kwargs={'collection_id': collection_id}))
+            else:
+                return redirect('choose_collection') 
+    else:
+        form = AuthorForm()
+    return render(request, 'add_author.html', {'form': form})
+
+
+def add_publisher(request, collection_id=None):
+    if request.method == "POST":
+        form = PublisherForm(request.POST)
+        if form.is_valid():
+            form.save()
+            
+            if 'save_and_add_new' in request.POST:
+                return redirect('add_publisher', collection_id=request.POST.get('collection_id'))
+            else:
+                return redirect('add_book', collection_id=request.POST.get('collection_id'))
+    else:
+        form = PublisherForm()
+    return render(request, 'add_publisher.html', {'form': form})
+
+def add_genre(request, collection_id=None):
+    if request.method == "POST":
+        form = GenreForm(request.POST)
+        if form.is_valid():
+            form.save()
+            if 'save_and_add_new' in request.POST:
+                return redirect('add_genre', collection_id=request.POST.get('collection_id'))
+            else:
+                return redirect('add_book', collection_id=request.POST.get('collection_id'))
+    else:
+        form = GenreForm()
+    return render(request, 'add_genre.html', {'form': form})
+
+def add_tag(request, collection_id=None):
+    if request.method == "POST":
+        form = TagForm(request.POST)
+        if form.is_valid():
+            form.save()
+            if 'save_and_add_new' in request.POST:
+                return redirect('add_tag', collection_id=request.POST.get('collection_id'))
+            else:
+                return redirect('add_book', collection_id=request.POST.get('collection_id'))
+    else:
+        form = TagForm()
+    return render(request, 'add_tag.html', {'form': form})

@@ -1,0 +1,10 @@
+<h2>Добавить жанр</h2>
+<form method="post" action="{% url 'add_genre' %}">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <input type="hidden" name="collection_id" value="{{ request.GET.collection_id }}">
+  <input type="hidden" name="title" value="{{ request.GET.title }}"> 
+  <input type="hidden" name="edition_number" value="{{ request.GET.edition_number }}"> 
+  <input type="hidden" name="comment" value="{{ request.GET.comment }}"> 
+  <button type="submit">Сохранить</button>
+</form>
