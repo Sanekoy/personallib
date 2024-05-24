@@ -1,10 +1,15 @@
 <h2>Добавить издателя</h2>
-<form method="post" action="{% url 'add_publisher' %}">
+<form method="post" action="{% url 'add_publisher' %}?collection_id={{ request.GET.collection_id }}">
   {% csrf_token %}
   {{ form.as_p }}
   <input type="hidden" name="collection_id" value="{{ request.GET.collection_id }}">
-  <input type="hidden" name="title" value="{{ request.GET.title }}"> 
-  <input type="hidden" name="edition_number" value="{{ request.GET.edition_number }}"> 
-  <input type="hidden" name="comment" value="{{ request.GET.comment }}"> 
+  {% if messages %}
+  <ul class="messages">
+      {% for message in messages %}
+        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+      {% endfor %}
+  </ul>
+  {% endif %}
   <button type="submit">Сохранить</button>
+  <a href="{% url 'add_book' collection_id=request.GET.collection_id %}">Назад к добавлению книги</a>
 </form>

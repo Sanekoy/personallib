@@ -11,6 +11,7 @@ urlpatterns = [
     path('collection/<int:collection_id>/add_book/add_publisher/', views.add_publisher, name='add_publisher'),
     path('collection/<int:collection_id>/add_book/add_genre/', views.add_genre, name='add_genre'),
     path('collection/<int:collection_id>/add_book/add_tag/', views.add_tag, name='add_tag'),
+    path('add_author/<int:collection_id>/', views.add_author, name='add_author'), # Добавляем новый шаблон с collection_id
     path('add_author/', views.add_author, name='add_author'),
     path('add_publisher/', views.add_publisher, name='add_publisher'),
     path('add_genre/', views.add_genre, name='add_genre'),

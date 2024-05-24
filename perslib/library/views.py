@@ -2,13 +2,14 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .models import Collection, Book, Author, Publisher, Genre, Tag, Photo
 from .forms import BookForm, AuthorForm, PublisherForm, GenreForm, TagForm
 from django.urls import reverse
-from django.http import HttpResponseRedirect
+from django.contrib import messages
+from django.db import IntegrityError
 
 def choose_collection(request):
     if request.method == 'POST':
         collection_name = request.POST['collection_name']
         Collection.objects.create(name=collection_name)
-        return redirect('choose_collection') 
+        return redirect('choose_collection')
     else:
         collections = Collection.objects.all()
         return render(request, 'choose_collection.html', {'collections': collections})
@@ -138,62 +139,89 @@ def add_book(request, collection_id):
         }
         return render(request, 'add_book.html', context)
 
-def add_author(request, collection_id=None):
+def add_author(request):
+    collection_id = request.GET.get('collection_id')  # Получаем collection_id из GET-параметров
+    
     if request.method == "POST":
         form = AuthorForm(request.POST)
+        collection_id = request.POST.get('collection_id')  # Получаем collection_id из POST-параметров
         if form.is_valid():
-            form.save()
-            collection_id = request.POST.get('collection_id')
-
-            if collection_id:
-                if 'save_and_add_new' in request.POST:
-                    return redirect('add_author', collection_id=collection_id)
-                else:
-                    # Перенаправляем на /library/collection/1/add_book/
+            try:
+                form.save()
+                if collection_id:
                     return redirect(reverse('add_book', kwargs={'collection_id': collection_id}))
-            else:
-                return redirect('choose_collection') 
+                else:
+                    return redirect('choose_collection')  # Например, перенаправляем на выбор коллекции 
+            except IntegrityError:
+                messages.error(request, 'Автор с таким именем уже существует!')
+        else:
+            messages.error(request, 'Ошибка в форме. Проверьте введенные данные.')
+    
     else:
         form = AuthorForm()
-    return render(request, 'add_author.html', {'form': form})
+
+    return render(request, 'add_author.html', {'form': form, 'collection_id': collection_id})
 
 
 def add_publisher(request, collection_id=None):
+    collection_id = request.GET.get('collection_id')
     if request.method == "POST":
         form = PublisherForm(request.POST)
         if form.is_valid():
-            form.save()
-            
-            if 'save_and_add_new' in request.POST:
-                return redirect('add_publisher', collection_id=request.POST.get('collection_id'))
-            else:
-                return redirect('add_book', collection_id=request.POST.get('collection_id'))
+            try:
+                form.save()
+                collection_id = request.POST.get('collection_id')  # Получаем collection_id из GET-параметров
+
+                if collection_id:
+                    return redirect(reverse('add_book', kwargs={'collection_id': collection_id}))
+                else:
+                    return redirect('choose_collection')  # Например, перенаправляем на выбор коллекции 
+            except IntegrityError:
+                messages.error(request, 'Такой издатель уже существует!')
+        else:
+            messages.error(request, 'Ошибка в форме. Проверьте введенные данные.')
     else:
         form = PublisherForm()
     return render(request, 'add_publisher.html', {'form': form})
 
 def add_genre(request, collection_id=None):
+    collection_id = request.GET.get('collection_id')
     if request.method == "POST":
         form = GenreForm(request.POST)
         if form.is_valid():
-            form.save()
-            if 'save_and_add_new' in request.POST:
-                return redirect('add_genre', collection_id=request.POST.get('collection_id'))
-            else:
-                return redirect('add_book', collection_id=request.POST.get('collection_id'))
+            try:
+                form.save()
+                collection_id = request.POST.get('collection_id')  # Получаем collection_id из GET-параметров
+
+                if collection_id:
+                    return redirect(reverse('add_book', kwargs={'collection_id': collection_id}))
+                else:
+                    return redirect('choose_collection')  # Например, перенаправляем на выбор коллекции 
+            except IntegrityError:
+                messages.error(request, 'Такой жанр уже существует!')
+        else:
+            messages.error(request, 'Ошибка в форме. Проверьте введенные данные.')
     else:
         form = GenreForm()
     return render(request, 'add_genre.html', {'form': form})
 
 def add_tag(request, collection_id=None):
+    collection_id = request.GET.get('collection_id')
     if request.method == "POST":
         form = TagForm(request.POST)
         if form.is_valid():
-            form.save()
-            if 'save_and_add_new' in request.POST:
-                return redirect('add_tag', collection_id=request.POST.get('collection_id'))
-            else:
-                return redirect('add_book', collection_id=request.POST.get('collection_id'))
+            try:
+                form.save()
+                collection_id = request.POST.get('collection_id')  # Получаем collection_id из GET-параметров
+
+                if collection_id:
+                    return redirect(reverse('add_book', kwargs={'collection_id': collection_id}))
+                else:
+                    return redirect('choose_collection')  # Например, перенаправляем на выбор коллекции 
+            except IntegrityError:
+                messages.error(request, 'Такая метка уже существует!')
+        else:
+            messages.error(request, 'Ошибка в форме. Проверьте введенные данные.')
     else:
         form = TagForm()
     return render(request, 'add_tag.html', {'form': form})
