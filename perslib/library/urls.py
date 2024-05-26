@@ -9,6 +9,7 @@ urlpatterns = [
     path('collection/<int:collection_id>/book/<int:book_id>/', views.view_book, name='view_book'),
     path('collection/<int:collection_id>/book/<int:book_id>/delete/', views.delete_book, name='delete_book'),
     path('collection/<int:collection_id>/book/<int:book_id>/edit/', views.edit_book, name='edit_book'),
+    path('collection/<int:collection_id>/book/<int:book_id>/photo/<int:photo_id>/delete/', views.delete_photo, name='delete_photo'),
     path('add_author/', views.add_author, name='add_author'),
     path('add_publisher/', views.add_publisher, name='add_publisher'),
     path('add_genre/', views.add_genre, name='add_genre'),

@@ -12,7 +12,7 @@
         <input type="text" name="q" placeholder="Поиск по названию" value="{{ request.GET.q }}">
 
         <div>
-            <h3>Автор</h3>
+            <h3>Авторы</h3>
             <select name="author">
                 <option value="">Все авторы</option>
                 {% for author in all_authors %}
@@ -22,9 +22,9 @@
         </div>
 
         <div>
-            <h3>Издатель</h3>
+            <h3>Издательства</h3>
             <select name="publisher">
-                <option value="">Все издатели</option>
+                <option value="">Все издательства</option>
                 {% for publisher in all_publishers %}
                     <option value="{{ publisher.id }}" {% if request.GET.publisher == publisher.id|stringformat:"s" %}selected{% endif %}>{{ publisher.name }}</option>
                 {% endfor %}
@@ -32,7 +32,7 @@
         </div>
 
         <div>
-            <h3>Жанр</h3>
+            <h3>Жанры</h3>
             <select name="genre">
                 <option value="">Все жанры</option>
                 {% for genre in all_genres %}
@@ -42,7 +42,7 @@
         </div>
 
         <div>
-            <h3>Метка</h3>
+            <h3>Метки</h3>
             <select name="tag">
                 <option value="">Все метки</option>
                 {% for tag in all_tags %}
@@ -58,28 +58,28 @@
     <ul>
         {% for book in books %}
             <li>
-                <h3><a href="{% url 'view_book' collection.id book.id %}">{{ book.title }}</a></h3>
-                <p><strong>Автор:</strong> 
+                <h3><a href="{% url 'view_book' book.id %}">{{ book.title }}</a></h3>
+                <p><strong>Авторы:</strong> 
                     {% for author in book.authors.all %}
                         {{ author.name }}{% if not forloop.last %}, {% endif %}
                     {% endfor %}
                 </p>
-                <p><strong>Издатель:</strong> 
+                <p><strong>Издательство:</strong> 
                     {% for publisher in book.publishers.all %}
                         {{ publisher.name }}{% if not forloop.last %}, {% endif %}
                     {% endfor %}
                 </p>
-                <p><strong>Жанр:</strong> 
+                <p><strong>Жанры:</strong> 
                     {% for genre in book.genres.all %}
                         {{ genre.name }}{% if not forloop.last %}, {% endif %}
                     {% endfor %}
                 </p>
-                <p><strong>Метка:</strong> 
+                <p><strong>Метки:</strong> 
                     {% for tag in book.tags.all %}
                         {{ tag.name }}{% if not forloop.last %}, {% endif %}
                     {% endfor %}
                 </p>
-                <p><strong>Комментарий:</strong> {{ book.comment }}</p>
+                <p><strong>Комментарии:</strong> {{ book.comment }}</p>
             </li>
         {% endfor %}
     </ul>
