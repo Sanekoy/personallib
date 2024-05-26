@@ -1,15 +1,8 @@
-<h2>Добавить тег</h2>
+<h2>Добавить метку</h2>
 <form method="post" action="{% url 'add_tag' %}?collection_id={{ request.GET.collection_id }}">
   {% csrf_token %}
   {{ form.as_p }}
   <input type="hidden" name="collection_id" value="{{ request.GET.collection_id }}">
-  {% if messages %}
-  <ul class="messages">
-      {% for message in messages %}
-        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-      {% endfor %}
-  </ul>
-  {% endif %}
   <button type="submit">Сохранить</button>
   <a href="{% url 'add_book' collection_id=request.GET.collection_id %}">Назад к добавлению книги</a>
 </form>

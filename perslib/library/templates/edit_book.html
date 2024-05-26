@@ -1,0 +1,9 @@
+<h1>Редактирование книги: {{ book.title }}</h1>
+
+<form method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+</form>
+
+<a href="{% url 'view_book' collection.id book.id %}" class="btn btn-secondary">Назад к книге</a>

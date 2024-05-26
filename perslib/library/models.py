@@ -11,7 +11,7 @@ class Collection(models.Model):
 
 class Book(models.Model):
     title = models.CharField(max_length=255)
-    edition_number = models.IntegerField(validators=[MaxValueValidator(4)], blank=True, null=True)
+    edition_number = models.IntegerField(validators=[MaxValueValidator(9999)], blank=True, null=True)
     comment = models.TextField(blank=True, null=True)
     authors = models.ManyToManyField('Author', related_name='books')
     publishers = models.ManyToManyField('Publisher', related_name='books')
