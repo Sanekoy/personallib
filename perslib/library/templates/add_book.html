@@ -5,19 +5,7 @@
   <h2>Создать новую книгу</h2>
   <form method="post" enctype="multipart/form-data" action="{% url 'add_book' collection.id %}">
     {% csrf_token %}
-
-    <div>
-        {{ book_form.title.label_tag }}
-        {{ book_form.title }}
-    </div>
-    <div>
-        {{ book_form.edition_number.label_tag }}
-        {{ book_form.edition_number }}
-    </div>
-    <div>
-        {{ book_form.comment.label_tag }}
-        {{ book_form.comment }}
-    </div>
+    {{ book_form.as_p }}
 
     <h3>Авторы</h3>
     <div>
@@ -60,7 +48,7 @@
     <a href="{% url 'add_tag' %}?collection_id={{ collection.id }}">Добавить метку</a>
 
     <h3>Фотографии</h3>
-    <input type="file" name="photos" multiple>
+    <input type="file" name="photos" accept="image/*" multiple> <br> 
 
     <button type="submit">Сохранить книгу</button>
 </form>
@@ -70,10 +58,13 @@
     {% csrf_token %}
     <select name="book_id">
         {% for book in all_books %}
-            <option value="{{ book.id }}">{{ book.title }}</option>
+            <!-- Исключаем книги из текущей коллекции -->
+            {% if book not in collection.books.all %}
+                <option value="{{ book.id }}">{{ book.title }}</option>
+            {% endif %}
         {% endfor %}
     </select>
     <button type="submit">Добавить книгу</button>
 </form>
-
+<a href="{% url 'view_collection' collection.id %}">Назад к выбору коллекции</a>
 {% endblock %}
