@@ -55,6 +55,7 @@
     </form>
 
     <h2>Книги в коллекции</h2>
+    <a href="{% url 'generate_pdf_report' collection.id %}" target="_blank">Сформировать PDF отчет</a>
     <ul>
         {% for book in books %}
             <li>

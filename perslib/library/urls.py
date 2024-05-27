@@ -16,5 +16,7 @@ urlpatterns = [
     path('register/', views.register, name='register'),
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
+    path('generate_pdf_report/<int:collection_id>/', views.generate_pdf_report, name='generate_pdf_report'),
+    path('collection/<int:collection_id>/book/<int:book_id>/generate_pdf_report/', views.generate_book_pdf_report, name='generate_book_pdf_report'),
     
 ]

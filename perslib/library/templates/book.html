@@ -6,6 +6,7 @@
 </head>
 <body>
     <h1>{{ book.title }}</h1>
+    <a href="{% url 'generate_book_pdf_report' collection.id book.id %}" target="_blank">Сформировать PDF отчет</a>
     <p><strong>Авторы:</strong>
         {% regroup book.authors.all by name as authors_list %}
         {% for author in authors_list|dictsort:0 %}

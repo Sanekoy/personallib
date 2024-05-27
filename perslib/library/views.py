@@ -8,6 +8,20 @@ from django.contrib import messages
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
+from django.http import FileResponse
+from .report import generate_collection_report 
+from django.http import HttpResponse
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import letter
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+from django.templatetags.static import static
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfgen import canvas
+from reportlab.lib.units import inch
+import os
+from django.conf import settings
 
 @login_required
 def choose_collection(request):
@@ -61,10 +75,97 @@ def view_collection(request, collection_id):
         'all_tags': all_tags,
     })
 
+def generate_pdf_report(request, collection_id):
+    collection = get_object_or_404(Collection, pk=collection_id)
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="{collection.name}_report.pdf"'
+
+    # Регистрация шрифта
+    font_path = os.path.join(settings.STATIC_ROOT, 'font.ttf')
+    pdfmetrics.registerFont(TTFont('CustomFont', font_path))
+
+    doc = SimpleDocTemplate(response, pagesize=letter)
+    styles = getSampleStyleSheet()
+
+    # Создание стиля с использованием зарегистрированного шрифта
+    style_normal = styles['Normal']
+    style_normal.fontName = 'CustomFont'
+    style_normal.fontSize = 12
+
+    style_heading = styles['Heading1']
+    style_heading.fontName = 'CustomFont'
+    style_heading.fontSize = 16
+
+    elements = []
+
+    # Добавляем текст на основе стиля с использованием загруженного шрифта
+    elements.append(Paragraph(f'Отчет по коллекции "{collection.name}"', style_heading))  # Используем style_heading здесь
+    elements.append(Spacer(1, 0.5 * inch))
+
+    # Добавляем другие элементы PDF-документа...
+    data = []
+    data.append(['Название книги', 'Авторы', 'Издательство'])
+
+    for book in collection.books.all().order_by('title'):
+        authors = ', '.join(author.name for author in book.authors.all())
+        publishers = ', '.join(publisher.name for publisher in book.publishers.all())
+        data.append([book.title, authors, publishers])
+
+    table = Table(data)
+    table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, -1), 'CustomFont'), 
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+        ('FONTSIZE', (0, 0), (-1, -1), 12)  
+    ]))
+
+    elements.append(table)
+    doc.build(elements)
+    return response
+
 def view_book(request, collection_id, book_id):
     book = get_object_or_404(Book, pk=book_id)
     collection = get_object_or_404(Collection, pk=collection_id)
     return render(request, 'book.html', {'book': book, 'collection': collection})
+
+def generate_book_pdf_report(request, collection_id, book_id):
+    book = get_object_or_404(Book, pk=book_id)
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="{book.title}_report.pdf"'
+
+    # Регистрация шрифта
+    font_path = os.path.join(settings.STATIC_ROOT, 'font.ttf')
+    pdfmetrics.registerFont(TTFont('CustomFont', font_path))
+
+    doc = SimpleDocTemplate(response, pagesize=letter)
+    styles = getSampleStyleSheet()
+
+    # Создание стиля с использованием зарегистрированного шрифта
+    style_normal = styles['Normal']
+    style_normal.fontName = 'CustomFont'
+    style_normal.fontSize = 12
+
+    style_heading = styles['Heading1']
+    style_heading.fontName = 'CustomFont'
+    style_heading.fontSize = 16
+
+    elements = []
+    elements.append(Paragraph(f'Информация о книге: {book.title}', style_heading))
+    elements.append(Spacer(1, 0.5 * inch))
+
+    # Добавляем информацию о книге
+    elements.append(Paragraph(f'Авторы: {", ".join([author.name for author in book.authors.all()])}', style_normal))
+    elements.append(Paragraph(f'Издательства: {", ".join([publisher.name for publisher in book.publishers.all()])}', style_normal))
+    elements.append(Paragraph(f'Жанры: {", ".join([genre.name for genre in book.genres.all()])}', style_normal))
+    elements.append(Paragraph(f'Метки: {", ".join([tag.name for tag in book.tags.all()])}', style_normal))
+    elements.append(Paragraph(f'Номер издания: {book.edition_number}', style_normal))
+    elements.append(Paragraph(f'Комментарии: {book.comment}', style_normal))
+
+    doc.build(elements)
+    return response
 
 def delete_book(request, collection_id, book_id):
     collection = get_object_or_404(Collection, pk=collection_id)
