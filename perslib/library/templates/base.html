@@ -1,12 +1,43 @@
 <!DOCTYPE html>
-<html lang="en">
+
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Моя библиотека{% endblock %}</title>
+    <title>Личная Библиотека</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" type="text/css" media="all">
+    <!-- Добавьте любые другие необходимые файлы стилей -->
 </head>
 <body>
-    {% block content %}
-    {% endblock %}
+    <div class="wrapper">
+        <header>
+            <div class="container">
+                <h1><a href="/">Личная Библиотека</a></h1>
+                <nav>
+                    <ul>
+                        {% if user.is_authenticated %}
+                            <li><a href="{% url 'choose_collection' %}">Мои коллекции</a></li>
+                            <li><a href="{% url 'logout' %}">Выйти ({% if user.username %}{{ user.username }}{% endif %})</a></li>
+                        {% else %}
+                            <li><a href="{% url 'login' %}">Войти</a></li>
+                            <li><a href="{% url 'register' %}">Регистрация</a></li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+        </header>
+
+        <main class="container">
+            {% block content %}
+            {% endblock %}
+        </main>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>2024 Личная Библиотека</p>
+        </div>
+    </footer>
 </body>
 </html>

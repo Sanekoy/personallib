@@ -1,10 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Выберите Коллекцию</title>
-</head>
-<body>
+{% extends 'base.html' %}
+
+{% block content %}
     <h1>Выберите Коллекцию</h1>
 
     <h2>Создать новую коллекцию</h2>
@@ -23,6 +19,4 @@
             </li>
         {% endfor %}
     </ul>
-
-</body>
-</html>
+{% endblock %} 

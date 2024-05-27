@@ -1,18 +1,24 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Collection, Book, Author, Publisher, Genre, Tag, Photo
-from .forms import BookForm, AuthorForm, PublisherForm, GenreForm, TagForm
+from .forms import BookForm, AuthorForm, PublisherForm, GenreForm, TagForm, UserRegistrationForm
+from django.contrib.auth import login, authenticate
 from django.urls import reverse
 from django.db import IntegrityError
 from django.contrib import messages
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth import logout
+from django.contrib.auth.decorators import login_required
 
+@login_required
 def choose_collection(request):
     if request.method == 'POST':
         collection_name = request.POST['collection_name']
-        Collection.objects.create(name=collection_name)
+        Collection.objects.create(name=collection_name, user=request.user)
         return redirect('choose_collection')
     else:
-        collections = Collection.objects.all().order_by('name')
+        collections = Collection.objects.filter(user=request.user).order_by('name')
         return render(request, 'choose_collection.html', {'collections': collections})
+
     
 def view_collection(request, collection_id):
     collection = get_object_or_404(Collection, pk=collection_id)
@@ -387,3 +393,34 @@ def add_tag(request, collection_id=None):
         'book_id': book_id,
     }
     return render(request, 'add_tag.html', context)
+
+def register(request):
+    if request.method == 'POST':
+        form = UserRegistrationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            return redirect('choose_collection')
+    else:
+        form = UserRegistrationForm()
+    return render(request, 'register.html', {'form': form})
+
+def login_view(request):
+    if request.method == 'POST':
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user = authenticate(username=username, password=password)
+            if user is not None:
+                login(request, user)
+                return redirect('choose_collection')
+            else:
+                return render(request, 'login.html', {'form': form})
+    else:
+        form = AuthenticationForm()
+    return render(request, 'login.html', {'form': form})
+
+def logout_view(request):
+    logout(request)
+    return redirect('login')

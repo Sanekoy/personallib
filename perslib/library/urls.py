@@ -13,5 +13,8 @@ urlpatterns = [
     path('add_publisher/', views.add_publisher, name='add_publisher'),
     path('add_genre/', views.add_genre, name='add_genre'),
     path('add_tag/', views.add_tag, name='add_tag'),
+    path('register/', views.register, name='register'),
+    path('login/', views.login_view, name='login'),
+    path('logout/', views.logout_view, name='logout'),
     
 ]
