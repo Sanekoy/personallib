@@ -1,19 +1,25 @@
-<h2>Добавить издателя</h2>
-<form method="post" action="{% url 'add_publisher' %}?collection_id={{ collection_id }}{% if book_id %}&book_id={{ book_id }}{% endif %}">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <input type="hidden" name="collection_id" value="{{ collection_id }}">
-  <input type="hidden" name="book_id" value="{{ book_id }}">
-  <button type="submit">Сохранить</button>
-  <a href="
-  {% if book_id %}
-      {% url 'edit_book' collection_id=collection_id book_id=book_id %}
-  {% elif collection_id %}
-      {% url 'add_book' collection_id=collection_id %}
-  {% else %}
-      {% url 'choose_collection' %}
-  {% endif %}
-  ">
-  Назад 
-  </a>
-</form>
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="add-publisher-container">
+    <h2>Добавить издателя</h2>
+    <form method="post" action="{% url 'add_publisher' %}?collection_id={{ collection_id }}{% if book_id %}&book_id={{ book_id }}{% endif %}">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type="hidden" name="collection_id" value="{{ collection_id }}">
+        <input type="hidden" name="book_id" value="{{ book_id }}">
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Сохранить</button>
+            <a href="
+            {% if book_id %}
+                {% url 'edit_book' collection_id=collection_id book_id=book_id %}
+            {% elif collection_id %}
+                {% url 'add_book' collection_id=collection_id %}
+            {% else %}
+                {% url 'choose_collection' %}
+            {% endif %}
+            " class="btn btn-secondary">Назад</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

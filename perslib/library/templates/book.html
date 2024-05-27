@@ -1,47 +1,50 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Просмотр книги: {{ book.title }}</title>
-</head>
-<body>
-    <h1>{{ book.title }}</h1>
-    <a href="{% url 'generate_book_pdf_report' collection.id book.id %}" target="_blank">Сформировать PDF отчет</a>
-    <p><strong>Авторы:</strong>
-        {% regroup book.authors.all by name as authors_list %}
-        {% for author in authors_list|dictsort:0 %}
-            {{ author.grouper }}{% if not forloop.last %}, {% endif %}
-        {% endfor %}
-    </p>
-    <p><strong>Издательства:</strong> 
-        {% regroup book.publishers.all by name as publishers_list %}
-        {% for publisher in publishers_list|dictsort:0 %}
-            {{ publisher.grouper }}{% if not forloop.last %}, {% endif %}
-        {% endfor %}
-    </p>
-    <p><strong>Жанры:</strong> 
-        {% regroup book.genres.all by name as genres_list %}
-        {% for genre in genres_list|dictsort:0 %}
-            {{ genre.grouper }}{% if not forloop.last %}, {% endif %}
-        {% endfor %}
-    </p>
-    <p><strong>Метки:</strong> 
-        {% regroup book.tags.all by name as tags_list %}
-        {% for tag in tags_list|dictsort:0 %}
-            {{ tag.grouper }}{% if not forloop.last %}, {% endif %}
-        {% endfor %}
-    </p>
-    <p><strong>Номер издания:</strong> {{ book.edition_number }}</p>
-    <p><strong>Комментарии:</strong> {{ book.comment }}</p>
-    
-    <h2>Фотографии</h2>
-    <div>
-        {% for photo in book.photos.all %}
-            <img src="{{ photo.image.url }}" alt="Фото книги">
-        {% endfor %}
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="book-container">
+        <h1>{{ book.title }}</h1>
+        <a href="{% url 'generate_book_pdf_report' collection.id book.id %}" target="_blank" class="btn">Сформировать PDF отчет</a>
+        
+        <div class="book-details">
+            <p><strong>Авторы:</strong>
+                {% regroup book.authors.all by name as authors_list %}
+                {% for author in authors_list|dictsort:0 %}
+                    {{ author.grouper }}{% if not forloop.last %}, {% endif %}
+                {% endfor %}
+            </p>
+            <p><strong>Издательства:</strong> 
+                {% regroup book.publishers.all by name as publishers_list %}
+                {% for publisher in publishers_list|dictsort:0 %}
+                    {{ publisher.grouper }}{% if not forloop.last %}, {% endif %}
+                {% endfor %}
+            </p>
+            <p><strong>Жанры:</strong> 
+                {% regroup book.genres.all by name as genres_list %}
+                {% for genre in genres_list|dictsort:0 %}
+                    {{ genre.grouper }}{% if not forloop.last %}, {% endif %}
+                {% endfor %}
+            </p>
+            <p><strong>Метки:</strong> 
+                {% regroup book.tags.all by name as tags_list %}
+                {% for tag in tags_list|dictsort:0 %}
+                    {{ tag.grouper }}{% if not forloop.last %}, {% endif %}
+                {% endfor %}
+            </p>
+            <p><strong>Номер издания:</strong> {{ book.edition_number }}</p>
+            <p><strong>Комментарии:</strong> {{ book.comment }}</p>
+        </div>
+
+        <h2>Фотографии</h2>
+        <div class="book-photos">
+            {% for photo in book.photos.all %}
+                <img src="{{ photo.image.url }}" alt="Фото книги">
+            {% endfor %}
+        </div>
+        
+        <div class="actions">
+            <a href="{% url 'edit_book' collection.id book.id %}" class="btn btn-primary">Редактировать</a>
+            <a href="{% url 'delete_book' collection.id book.id %}" class="btn btn-danger" onclick="return confirm('Вы уверены, что хотите удалить книгу?')">Удалить</a>
+            <a href="{% url 'view_collection' collection.id %}" class="btn">Назад к коллекции</a>
+        </div>
     </div>
-    <a href="{% url 'edit_book' collection.id book.id %}" class="btn btn-primary">Редактировать</a>
-    <a href="{% url 'delete_book' collection.id book.id %}" class="btn btn-danger" onclick="return confirm('Вы уверены, что хотите удалить книгу?')">Удалить</a>
-    <a href="{% url 'view_collection' book.collections.first.id %}">Назад к коллекции</a>
-</body>
-</html>
+{% endblock %}

@@ -1,96 +1,98 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Коллекция: {{ collection.name }}</title>
-</head>
-<body>
-    <h1>Коллекция: {{ collection.name }}</h1>
+{% extends 'base.html' %}
 
-    <h2>Фильтры</h2>
-    <form method="get" action=".">
-        <input type="text" name="q" placeholder="Поиск по названию" value="{{ request.GET.q }}">
+{% block content %}
+    <div class="collection-container">
+        <h1>Коллекция: {{ collection.name }}</h1>
 
-        <div>
-            <h3>Авторы</h3>
-            <select name="author">
-                <option value="">Все авторы</option>
-                {% for author in all_authors %}
-                    <option value="{{ author.id }}" {% if request.GET.author == author.id|stringformat:"s" %}selected{% endif %}>{{ author.name }}</option>
-                {% endfor %}
-            </select>
+        <div class="filters">
+            <h2>Фильтры</h2>
+            <form method="get" action=".">
+                <input type="text" name="q" placeholder="Поиск по названию" value="{{ request.GET.q }}" class="form-control">
+
+                <div class="filter-group">
+                    <h3>Авторы</h3>
+                    <select name="author" class="form-control">
+                        <option value="">Все авторы</option>
+                        {% for author in all_authors %}
+                            <option value="{{ author.id }}" {% if request.GET.author == author.id|stringformat:"s" %}selected{% endif %}>{{ author.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <h3>Издательства</h3>
+                    <select name="publisher" class="form-control">
+                        <option value="">Все издательства</option>
+                        {% for publisher in all_publishers %}
+                            <option value="{{ publisher.id }}" {% if request.GET.publisher == publisher.id|stringformat:"s" %}selected{% endif %}>{{ publisher.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <h3>Жанры</h3>
+                    <select name="genre" class="form-control">
+                        <option value="">Все жанры</option>
+                        {% for genre in all_genres %}
+                            <option value="{{ genre.id }}" {% if request.GET.genre == genre.id|stringformat:"s" %}selected{% endif %}>{{ genre.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <h3>Метки</h3>
+                    <select name="tag" class="form-control">
+                        <option value="">Все метки</option>
+                        {% for tag in all_tags %}
+                            <option value="{{ tag.id }}" {% if request.GET.tag == tag.id|stringformat:"s" %}selected{% endif %}>{{ tag.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <button type="submit" class="btn">Применить</button>
+            </form>
         </div>
 
-        <div>
-            <h3>Издательства</h3>
-            <select name="publisher">
-                <option value="">Все издательства</option>
-                {% for publisher in all_publishers %}
-                    <option value="{{ publisher.id }}" {% if request.GET.publisher == publisher.id|stringformat:"s" %}selected{% endif %}>{{ publisher.name }}</option>
+        <div class="books">
+            <h2>Книги в коллекции</h2>
+            <a href="{% url 'generate_pdf_report' collection.id %}" target="_blank" class="btn">Сформировать PDF отчет</a>
+            <ul class="book-list">
+                {% for book in books %}
+                    <li class="book-item">
+                        <h3><a href="{% url 'view_book' collection.id book.id %}">{{ book.title }}</a></h3>
+                        <p><strong>Авторы:</strong>
+                            {% regroup book.authors.all by name as authors_list %}
+                            {% for author in authors_list|dictsort:0 %}
+                                {{ author.grouper }}{% if not forloop.last %}, {% endif %}
+                            {% endfor %}
+                        </p>
+                        <p><strong>Издательство:</strong> 
+                            {% regroup book.publishers.all by name as publishers_list %}
+                            {% for publisher in publishers_list|dictsort:0 %}
+                                {{ publisher.grouper }}{% if not forloop.last %}, {% endif %}
+                            {% endfor %}
+                        </p>
+                        <p><strong>Жанры:</strong> 
+                            {% regroup book.genres.all by name as genres_list %}
+                            {% for genre in genres_list|dictsort:0 %}
+                                {{ genre.grouper }}{% if not forloop.last %}, {% endif %}
+                            {% endfor %}
+                        </p>
+                        <p><strong>Метки:</strong> 
+                            {% regroup book.tags.all by name as tags_list %}
+                            {% for tag in tags_list|dictsort:0 %}
+                                {{ tag.grouper }}{% if not forloop.last %}, {% endif %}
+                            {% endfor %}
+                        </p>
+                        <p><strong>Комментарии:</strong> {{ book.comment }}</p>
+                    </li>
                 {% endfor %}
-            </select>
+            </ul>
         </div>
 
-        <div>
-            <h3>Жанры</h3>
-            <select name="genre">
-                <option value="">Все жанры</option>
-                {% for genre in all_genres %}
-                    <option value="{{ genre.id }}" {% if request.GET.genre == genre.id|stringformat:"s" %}selected{% endif %}>{{ genre.name }}</option>
-                {% endfor %}
-            </select>
+        <div class="actions">
+            <a href="{% url 'add_book' collection.id %}" class="btn">Добавить книгу</a> 
+            <a href="{% url 'choose_collection' %}" class="btn">Назад к выбору коллекции</a>
         </div>
-
-        <div>
-            <h3>Метки</h3>
-            <select name="tag">
-                <option value="">Все метки</option>
-                {% for tag in all_tags %}
-                    <option value="{{ tag.id }}" {% if request.GET.tag == tag.id|stringformat:"s" %}selected{% endif %}>{{ tag.name }}</option>
-                {% endfor %}
-            </select>
-        </div>
-
-        <button type="submit">Применить</button>
-    </form>
-
-    <h2>Книги в коллекции</h2>
-    <a href="{% url 'generate_pdf_report' collection.id %}" target="_blank">Сформировать PDF отчет</a>
-    <ul>
-        {% for book in books %}
-            <li>
-                <h3><a href="{% url 'view_book' collection.id book.id %}">{{ book.title }}</a></h3>
-                <p><strong>Авторы:</strong>
-                    {% regroup book.authors.all by name as authors_list %}
-                    {% for author in authors_list|dictsort:0 %}
-                        {{ author.grouper }}{% if not forloop.last %}, {% endif %}
-                    {% endfor %}
-                </p>
-                <p><strong>Издательство:</strong> 
-                    {% regroup book.publishers.all by name as publishers_list %}
-                    {% for publisher in publishers_list|dictsort:0 %}
-                        {{ publisher.grouper }}{% if not forloop.last %}, {% endif %}
-                    {% endfor %}
-                </p>
-                <p><strong>Жанры:</strong> 
-                    {% regroup book.genres.all by name as genres_list %}
-                    {% for genre in genres_list|dictsort:0 %}
-                        {{ genre.grouper }}{% if not forloop.last %}, {% endif %}
-                    {% endfor %}
-                </p>
-                <p><strong>Метки:</strong> 
-                    {% regroup book.tags.all by name as tags_list %}
-                    {% for tag in tags_list|dictsort:0 %}
-                        {{ tag.grouper }}{% if not forloop.last %}, {% endif %}
-                    {% endfor %}
-                </p>
-                <p><strong>Комментарии:</strong> {{ book.comment }}</p>
-            </li>
-        {% endfor %}
-    </ul>
-
-    <a href="{% url 'add_book' collection.id %}">Добавить книгу</a> 
-    <br>
-    <a href="{% url 'choose_collection' %}">Назад к выбору коллекции</a>
-</body>
-</html>
+    </div>
+{% endblock %}

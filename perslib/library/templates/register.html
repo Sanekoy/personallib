@@ -1,19 +1,25 @@
-<h2>Регистрация</h2>
-<form method="post">
-    {% csrf_token %}
+{% extends 'base.html' %}
 
-    {% for field in form %}
-        <div class="form-group">
-            {{ field.label_tag }}
-            {{ field }}
-            {% if field.errors %}
-                <div class="invalid-feedback">
-                    {{ field.errors }}
-                </div>
-            {% endif %}
-        </div>
-    {% endfor %}
+{% block content %}
+<div class="register-container">
+    <h2>Регистрация</h2>
+    <form method="post">
+        {% csrf_token %}
 
-    <button type="submit">Зарегистрироваться</button>
-    <p>У вас уже есть аккаунт? <a href="{% url 'login' %}">Войти</a></p>
-</form>
+        {% for field in form %}
+            <div class="form-group">
+                {{ field.label_tag }}
+                {{ field }}
+                {% if field.errors %}
+                    <div class="invalid-feedback">
+                        {{ field.errors }}
+                    </div>
+                {% endif %}
+            </div>
+        {% endfor %}
+
+        <button type="submit" class="btn btn-primary">Зарегистрироваться</button>
+        <p>У вас уже есть аккаунт? <a href="{% url 'login' %}" class="btn-link">Войти</a></p>
+    </form>
+</div>
+{% endblock %}

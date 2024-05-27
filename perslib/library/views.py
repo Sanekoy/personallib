@@ -23,6 +23,9 @@ from reportlab.lib.units import inch
 import os
 from django.conf import settings
 
+def home(request):
+    return render(request, 'home.html')
+
 @login_required
 def choose_collection(request):
     if request.method == 'POST':

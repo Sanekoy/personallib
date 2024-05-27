@@ -1,18 +1,25 @@
-<h2>Вход</h2>
-<form method="post">
-    {% csrf_token %}
+{% extends 'base.html' %}
 
-    {% if form.errors %}
-        <p class="error">Неверное имя пользователя или пароль.</p>
-    {% endif %}
+{% block content %}
+<div class="login-container">
+    <h2>Вход</h2>
+    <form method="post">
+        {% csrf_token %}
 
-    <div class="form-group">
-        <label for="username">Имя пользователя:</label>
-        <input type="text" name="username" id="username" required>
-    </div>
-    <div class="form-group">
-        <label for="password">Пароль:</label>
-        <input type="password" name="password" id="password" required>
-    </div>
-    <button type="submit">Войти</button>
-</form>
+        {% if form.errors %}
+            <p class="error">Неверное имя пользователя или пароль.</p>
+        {% endif %}
+
+        <div class="form-group">
+            <label for="username">Имя пользователя:</label>
+            <input type="text" name="username" id="username" required class="form-control">
+        </div>
+        <div class="form-group">
+            <label for="password">Пароль:</label>
+            <input type="password" name="password" id="password" required class="form-control">
+        </div>
+        <button type="submit" class="btn btn-primary">Войти</button>
+        <p>У вас нет аккаунта? <a href="{% url 'register' %}" class="btn-link">Зарегистрироваться</a></p>
+    </form>
+</div>
+{% endblock %}

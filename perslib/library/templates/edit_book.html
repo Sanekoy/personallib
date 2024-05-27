@@ -1,108 +1,124 @@
-<h1>Редактирование книги: {{ book.title }}</h1>
+{% extends 'base.html' %}
 
-<form method="POST" enctype="multipart/form-data">
-  {% csrf_token %}
-  <input type="hidden" name="action" value=""> 
+{% block content %}
+<div class="edit-book-container">
+    <h1>Редактирование книги: {{ book.title }}</h1>
 
-  <h2>Основные данные</h2>
-  <div class="form-group">
-    <label for="id_title">Название:</label>
-    <input type="text" name="title" value="{{ book.title }}" maxlength="255" required id="id_title">
-  </div>
-  <div class="form-group">
-    <label for="id_edition_number">Номер издания:</label>
-    <input type="number" name="edition_number" value="{{ book.edition_number }}" min="1" max="9999" id="id_edition_number">
-  </div>
-  <div class="form-group">
-    <label for="id_comment">Комментарий:</label>
-    <textarea name="comment" cols="40" rows="10" id="id_comment">{{ book.comment }}</textarea>
-  </div>
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="hidden" name="action" value=""> 
 
-  <h2>Авторы</h2>
-  <ul>
-    {% for author in book.authors.all %}
-      <li>
-        {{ author.name }}
-        <button type="submit" name="action" value="remove_author_{{ author.pk }}">Удалить</button>
-      </li>
-    {% endfor %}
-  </ul>
-  <select name="add_author">
-    <option value="">Выберите автора для добавления</option>
-    {% for author in available_authors %}
-      <option value="{{ author.pk }}">{{ author.name }}</option>
-    {% endfor %}
-  </select>
-  <button type="submit" name="action" value="add_author">Добавить автора</button>
-  <br><a href="{% url 'add_author' %}?collection_id={{ collection.id }}&book_id={{ book.id }}">Добавить нового автора</a>
+        <h2>Основные данные</h2>
+        <div class="form-group">
+            <label for="id_title">Название:</label>
+            <input type="text" name="title" value="{{ book.title }}" maxlength="255" required id="id_title" class="form-control">
+        </div>
+        <div class="form-group">
+            <label for="id_edition_number">Номер издания:</label>
+            <input type="number" name="edition_number" value="{{ book.edition_number }}" min="1" max="9999" id="id_edition_number" class="form-control">
+        </div>
+        <div class="form-group">
+            <label for="id_comment">Комментарий:</label>
+            <textarea name="comment" cols="40" rows="10" id="id_comment" class="form-control">{{ book.comment }}</textarea>
+        </div>
 
-  <h2>Издатели</h2> 
-  <ul>
-    {% for publisher in book.publishers.all %}
-      <li>
-        {{ publisher.name }}
-        <button type="submit" name="action" value="remove_publisher_{{ publisher.pk }}">Удалить</button>
-      </li>
-    {% endfor %}
-  </ul>
-  <select name="add_publisher">
-    <option value="">Выберите издателя для добавления</option>
-    {% for publisher in available_publishers %}
-      <option value="{{ publisher.pk }}">{{ publisher.name }}</option>
-    {% endfor %}
-  </select>
-  <button type="submit" name="action" value="add_publisher">Добавить издателя</button>
-  <br><a href="{% url 'add_publisher' %}?collection_id={{ collection.id }}&book_id={{ book.id }}">Добавить нового издателя</a>
+        <h2>Авторы</h2>
+        <ul class="list-group">
+            {% for author in book.authors.all %}
+                <li class="list-group-item">
+                    {{ author.name }}
+                    <button type="submit" name="action" value="remove_author_{{ author.pk }}" class="btn btn-danger btn-sm float-right">Удалить</button>
+                </li>
+            {% endfor %}
+        </ul>
+        <div class="form-group">
+            <select name="add_author" class="form-control">
+                <option value="">Выберите автора для добавления</option>
+                {% for author in available_authors %}
+                    <option value="{{ author.pk }}">{{ author.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <button type="submit" name="action" value="add_author" class="btn btn-primary">Добавить автора</button>
+        <a href="{% url 'add_author' %}?collection_id={{ collection.id }}&book_id={{ book.id }}" class="btn-link">Добавить нового автора</a>
 
-  <h2>Жанры</h2>
-  <ul>
-    {% for genre in book.genres.all %}
-      <li>
-        {{ genre.name }}
-        <button type="submit" name="action" value="remove_genre_{{ genre.pk }}">Удалить</button>
-      </li>
-    {% endfor %}
-  </ul>
-  <select name="add_genre">
-    <option value="">Выберите жанр для добавления</option>
-    {% for genre in available_genres %}
-      <option value="{{ genre.pk }}">{{ genre.name }}</option>
-    {% endfor %}
-  </select>
-  <button type="submit" name="action" value="add_genre">Добавить жанр</button>
-  <br><a href="{% url 'add_genre' %}?collection_id={{ collection.id }}&book_id={{ book.id }}">Добавить новый жанр</a>
+        <h2>Издатели</h2> 
+        <ul class="list-group">
+            {% for publisher in book.publishers.all %}
+                <li class="list-group-item">
+                    {{ publisher.name }}
+                    <button type="submit" name="action" value="remove_publisher_{{ publisher.pk }}" class="btn btn-danger btn-sm float-right">Удалить</button>
+                </li>
+            {% endfor %}
+        </ul>
+        <div class="form-group">
+            <select name="add_publisher" class="form-control">
+                <option value="">Выберите издателя для добавления</option>
+                {% for publisher in available_publishers %}
+                    <option value="{{ publisher.pk }}">{{ publisher.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <button type="submit" name="action" value="add_publisher" class="btn btn-primary">Добавить издателя</button>
+        <a href="{% url 'add_publisher' %}?collection_id={{ collection.id }}&book_id={{ book.id }}" class="btn-link">Добавить нового издателя</a>
 
-  <h2>Метки</h2> 
-  <ul>
-    {% for tag in book.tags.all %}
-      <li>
-        {{ tag.name }}
-        <button type="submit" name="action" value="remove_tag_{{ tag.pk }}">Удалить</button>
-      </li>
-    {% endfor %}
-  </ul>
-  <select name="add_tag">
-    <option value="">Выберите метку для добавления</option>
-    {% for tag in available_tags %}
-      <option value="{{ tag.pk }}">{{ tag.name }}</option>
-    {% endfor %}
-  </select>
-  <button type="submit" name="action" value="add_tag">Добавить метку</button>
-  <br><a href="{% url 'add_tag' %}?collection_id={{ collection.id }}&book_id={{ book.id }}">Добавить новую метку</a>
+        <h2>Жанры</h2>
+        <ul class="list-group">
+            {% for genre in book.genres.all %}
+                <li class="list-group-item">
+                    {{ genre.name }}
+                    <button type="submit" name="action" value="remove_genre_{{ genre.pk }}" class="btn btn-danger btn-sm float-right">Удалить</button>
+                </li>
+            {% endfor %}
+        </ul>
+        <div class="form-group">
+            <select name="add_genre" class="form-control">
+                <option value="">Выберите жанр для добавления</option>
+                {% for genre in available_genres %}
+                    <option value="{{ genre.pk }}">{{ genre.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <button type="submit" name="action" value="add_genre" class="btn btn-primary">Добавить жанр</button>
+        <a href="{% url 'add_genre' %}?collection_id={{ collection.id }}&book_id={{ book.id }}" class="btn-link">Добавить новый жанр</a>
 
-  <h2>Фотографии</h2>
-  <div>
-    {% for photo in book.photos.all %}
-      <div>
-        <img src="{{ photo.image.url }}" alt="{{ photo.book.title }}" width="150"> 
-        <button type="submit" name="action" value="remove_photo_{{ photo.pk }}">Удалить</button>
-      </div>
-    {% endfor %}
-  </div>
-  <input type="file" name="add_photo" accept="image/*"> 
-  <button type="submit" name="action" value="add_photo">Добавить фото</button>
+        <h2>Метки</h2> 
+        <ul class="list-group">
+            {% for tag in book.tags.all %}
+                <li class="list-group-item">
+                    {{ tag.name }}
+                    <button type="submit" name="action" value="remove_tag_{{ tag.pk }}" class="btn btn-danger btn-sm float-right">Удалить</button>
+                </li>
+            {% endfor %}
+        </ul>
+        <div class="form-group">
+            <select name="add_tag" class="form-control">
+                <option value="">Выберите метку для добавления</option>
+                {% for tag in available_tags %}
+                    <option value="{{ tag.pk }}">{{ tag.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <button type="submit" name="action" value="add_tag" class="btn btn-primary">Добавить метку</button>
+        <a href="{% url 'add_tag' %}?collection_id={{ collection.id }}&book_id={{ book.id }}" class="btn-link">Добавить новую метку</a>
 
-  <button type="submit" name="action" value="save">Сохранить изменения</button>
-</form>
+        <h2>Фотографии</h2>
+        <div class="form-group book-photos">
+            {% for photo in book.photos.all %}
+                <div class="photo-wrapper">
+                    <img src="{{ photo.image.url }}" alt="{{ photo.book.title }}" class="book-photo"> 
+                    <button type="submit" name="action" value="remove_photo_{{ photo.pk }}" class="btn btn-danger btn-sm">Удалить</button>
+                </div>
+            {% endfor %}
+        </div>
+        <div class="form-group">
+            <input type="file" name="add_photo" accept="image/*" class="form-control-file"> 
+        </div>
+        <button type="submit" name="action" value="add_photo" class="btn btn-primary">Добавить фото</button>
 
-<a href="{% url 'view_book' collection.id book.id %}" class="btn btn-secondary">Назад к книге</a>
+        <button type="submit" name="action" value="save" class="btn btn-success">Сохранить изменения</button>
+    </form>
+
+    <a href="{% url 'view_book' collection.id book.id %}" class="btn btn-secondary">Назад к книге</a>
+</div>
+{% endblock %}
