@@ -11,12 +11,12 @@ def choose_collection(request):
         Collection.objects.create(name=collection_name)
         return redirect('choose_collection')
     else:
-        collections = Collection.objects.all()
+        collections = Collection.objects.all().order_by('name')
         return render(request, 'choose_collection.html', {'collections': collections})
     
 def view_collection(request, collection_id):
     collection = get_object_or_404(Collection, pk=collection_id)
-    books = collection.books.all()
+    books = collection.books.all().order_by('title')
 
     query = request.GET.get('q')
     author_id = request.GET.get('author')
@@ -230,10 +230,10 @@ def add_book(request, collection_id):
                 'publisher_form': publisher_form,
                 'genre_form': genre_form,
                 'tag_form': tag_form,
-                'all_authors': Author.objects.all(),
-                'all_publishers': Publisher.objects.all(),
-                'all_genres': Genre.objects.all(),
-                'all_tags': Tag.objects.all(),
+                'all_authors': Author.objects.all().order_by('name'),
+                'all_publishers': Publisher.objects.all().order_by('name'),
+                'all_genres': Genre.objects.all().order_by('name'),
+                'all_tags': Tag.objects.all().order_by('name'),
                 'all_books': all_books,
             }
             return render(request, 'add_book.html', context)
@@ -266,86 +266,124 @@ def add_book(request, collection_id):
         }
         return render(request, 'add_book.html', context)
     
-def add_author(request, collection_id=None):
-    collection_id = request.GET.get('collection_id')
+def add_author(request):
+    collection_id = request.GET.get('collection_id') or request.POST.get('collection_id')
+    book_id = request.GET.get('book_id') or request.POST.get('book_id')
+
+    if book_id == 'None':
+        book_id = None
 
     if request.method == "POST":
         form = AuthorForm(request.POST)
-        collection_id = request.POST.get('collection_id')
         if form.is_valid():
             try:
                 form.save()
-                if collection_id:
-                    return redirect(reverse('add_book', kwargs={'collection_id': collection_id}))
+                if book_id:
+                    return redirect('edit_book', collection_id=collection_id, book_id=book_id)
+                elif collection_id:
+                    return redirect('add_book', collection_id=collection_id)
                 else:
                     return redirect('choose_collection')
             except IntegrityError:
-                # Django автоматически обработает ошибку IntegrityError 
-                # и выведет стандартное сообщение об ошибке
-                pass 
+                pass
     else:
         form = AuthorForm()
 
-    return render(request, 'add_author.html', {'form': form, 'collection_id': collection_id})
+    context = {
+        'form': form,
+        'collection_id': collection_id,
+        'book_id': book_id,
+    }
+    return render(request, 'add_author.html', context)
 
 
-def add_publisher(request, collection_id=None):
-    collection_id = request.GET.get('collection_id')
+def add_publisher(request):
+    collection_id = request.GET.get('collection_id') or request.POST.get('collection_id')
+    book_id = request.GET.get('book_id') or request.POST.get('book_id')
+
+    if book_id == 'None':
+        book_id = None
 
     if request.method == "POST":
         form = PublisherForm(request.POST)
-        collection_id = request.POST.get('collection_id')  # Получаем collection_id из GET-параметров
         if form.is_valid():
             try:
                 form.save()
-                if collection_id:
-                    return redirect(reverse('add_book', kwargs={'collection_id': collection_id}))
+                if book_id:
+                    return redirect('edit_book', collection_id=collection_id, book_id=book_id)
+                elif collection_id:
+                    return redirect('add_book', collection_id=collection_id)
                 else:
                     return redirect('choose_collection')
             except IntegrityError:
                 pass
     else:
         form = PublisherForm()
-        
-    return render(request, 'add_publisher.html', {'form': form, 'collection_id': collection_id})
+
+    context = {
+        'form': form,
+        'collection_id': collection_id,
+        'book_id': book_id,
+    }
+    return render(request, 'add_publisher.html', context)
 
 
-def add_genre(request, collection_id=None):
-    collection_id = request.GET.get('collection_id')
+def add_genre(request):
+    collection_id = request.GET.get('collection_id') or request.POST.get('collection_id')
+    book_id = request.GET.get('book_id') or request.POST.get('book_id')
+
+    if book_id == 'None':
+        book_id = None
 
     if request.method == "POST":
         form = GenreForm(request.POST)
-        collection_id = request.POST.get('collection_id')  # Получаем collection_id из GET-параметров
         if form.is_valid():
             try:
                 form.save()
-                if collection_id:
-                    return redirect(reverse('add_book', kwargs={'collection_id': collection_id}))
+                if book_id:
+                    return redirect('edit_book', collection_id=collection_id, book_id=book_id)
+                elif collection_id:
+                    return redirect('add_book', collection_id=collection_id)
                 else:
                     return redirect('choose_collection')
             except IntegrityError:
                 pass
     else:
         form = GenreForm()
-        
-    return render(request, 'add_genre.html', {'form': form, 'collection_id': collection_id})
+
+    context = {
+        'form': form,
+        'collection_id': collection_id,
+        'book_id': book_id,
+    }
+    return render(request, 'add_genre.html', context)
 
 def add_tag(request, collection_id=None):
-    collection_id = request.GET.get('collection_id')
+    collection_id = request.GET.get('collection_id') or request.POST.get('collection_id')
+    book_id = request.GET.get('book_id') or request.POST.get('book_id')
+
+    if book_id == 'None':
+        book_id = None
 
     if request.method == "POST":
         form = TagForm(request.POST)
-        collection_id = request.POST.get('collection_id')  # Получаем collection_id из GET-параметров
         if form.is_valid():
             try:
                 form.save()
-                if collection_id:
-                    return redirect(reverse('add_book', kwargs={'collection_id': collection_id}))
+                if book_id:
+                    return redirect('edit_book', collection_id=collection_id, book_id=book_id)
+                elif collection_id:
+                    return redirect('add_book', collection_id=collection_id)
                 else:
                     return redirect('choose_collection')
             except IntegrityError:
                 pass
     else:
         form = TagForm()
-    
-    return render(request, 'add_tag.html', {'form': form, 'collection_id': collection_id})
+
+    context = {
+        'form': form,
+        'collection_id': collection_id,
+        'book_id': book_id,
+    }
+    return render(request, 'add_tag.html', context)

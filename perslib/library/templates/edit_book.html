@@ -34,6 +34,7 @@
     {% endfor %}
   </select>
   <button type="submit" name="action" value="add_author">Добавить автора</button>
+  <br><a href="{% url 'add_author' %}?collection_id={{ collection.id }}&book_id={{ book.id }}">Добавить нового автора</a>
 
   <h2>Издатели</h2> 
   <ul>
@@ -51,6 +52,7 @@
     {% endfor %}
   </select>
   <button type="submit" name="action" value="add_publisher">Добавить издателя</button>
+  <br><a href="{% url 'add_publisher' %}?collection_id={{ collection.id }}&book_id={{ book.id }}">Добавить нового издателя</a>
 
   <h2>Жанры</h2>
   <ul>
@@ -68,6 +70,7 @@
     {% endfor %}
   </select>
   <button type="submit" name="action" value="add_genre">Добавить жанр</button>
+  <br><a href="{% url 'add_genre' %}?collection_id={{ collection.id }}&book_id={{ book.id }}">Добавить новый жанр</a>
 
   <h2>Метки</h2> 
   <ul>
@@ -85,6 +88,7 @@
     {% endfor %}
   </select>
   <button type="submit" name="action" value="add_tag">Добавить метку</button>
+  <br><a href="{% url 'add_tag' %}?collection_id={{ collection.id }}&book_id={{ book.id }}">Добавить новую метку</a>
 
   <h2>Фотографии</h2>
   <div>

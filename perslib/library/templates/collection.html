@@ -59,24 +59,28 @@
         {% for book in books %}
             <li>
                 <h3><a href="{% url 'view_book' collection.id book.id %}">{{ book.title }}</a></h3>
-                <p><strong>Авторы:</strong> 
-                    {% for author in book.authors.all %}
-                        {{ author.name }}{% if not forloop.last %}, {% endif %}
+                <p><strong>Авторы:</strong>
+                    {% regroup book.authors.all by name as authors_list %}
+                    {% for author in authors_list|dictsort:0 %}
+                        {{ author.grouper }}{% if not forloop.last %}, {% endif %}
                     {% endfor %}
                 </p>
                 <p><strong>Издательство:</strong> 
-                    {% for publisher in book.publishers.all %}
-                        {{ publisher.name }}{% if not forloop.last %}, {% endif %}
+                    {% regroup book.publishers.all by name as publishers_list %}
+                    {% for publisher in publishers_list|dictsort:0 %}
+                        {{ publisher.grouper }}{% if not forloop.last %}, {% endif %}
                     {% endfor %}
                 </p>
                 <p><strong>Жанры:</strong> 
-                    {% for genre in book.genres.all %}
-                        {{ genre.name }}{% if not forloop.last %}, {% endif %}
+                    {% regroup book.genres.all by name as genres_list %}
+                    {% for genre in genres_list|dictsort:0 %}
+                        {{ genre.grouper }}{% if not forloop.last %}, {% endif %}
                     {% endfor %}
                 </p>
                 <p><strong>Метки:</strong> 
-                    {% for tag in book.tags.all %}
-                        {{ tag.name }}{% if not forloop.last %}, {% endif %}
+                    {% regroup book.tags.all by name as tags_list %}
+                    {% for tag in tags_list|dictsort:0 %}
+                        {{ tag.grouper }}{% if not forloop.last %}, {% endif %}
                     {% endfor %}
                 </p>
                 <p><strong>Комментарии:</strong> {{ book.comment }}</p>

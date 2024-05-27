@@ -1,15 +1,19 @@
 <h2>Добавить жанр</h2>
-<form method="post" action="{% url 'add_genre' %}?collection_id={{ request.GET.collection_id }}">
+<form method="post" action="{% url 'add_genre' %}?collection_id={{ collection_id }}{% if book_id %}&book_id={{ book_id }}{% endif %}">
   {% csrf_token %}
   {{ form.as_p }}
-  <input type="hidden" name="collection_id" value="{{ request.GET.collection_id }}">
-  {% if messages %}
-  <ul class="messages">
-      {% for message in messages %}
-        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-      {% endfor %}
-  </ul>
-  {% endif %}
+  <input type="hidden" name="collection_id" value="{{ collection_id }}">
+  <input type="hidden" name="book_id" value="{{ book_id }}">
   <button type="submit">Сохранить</button>
-  <a href="{% url 'add_book' collection_id=request.GET.collection_id %}">Назад к добавлению книги</a>
+  <a href="
+  {% if book_id %}
+      {% url 'edit_book' collection_id=collection_id book_id=book_id %}
+  {% elif collection_id %}
+      {% url 'add_book' collection_id=collection_id %}
+  {% else %}
+      {% url 'choose_collection' %}
+  {% endif %}
+  ">
+  Назад 
+  </a>
 </form>
