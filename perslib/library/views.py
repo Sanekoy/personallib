@@ -2,23 +2,18 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .models import Collection, Book, Author, Publisher, Genre, Tag, Photo
 from .forms import BookForm, AuthorForm, PublisherForm, GenreForm, TagForm, UserRegistrationForm
 from django.contrib.auth import login, authenticate
-from django.urls import reverse
 from django.db import IntegrityError
 from django.contrib import messages
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
-from django.http import FileResponse
-from .report import generate_collection_report 
 from django.http import HttpResponse
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
-from django.templatetags.static import static
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfbase import pdfmetrics
-from reportlab.pdfgen import canvas
 from reportlab.lib.units import inch
 import os
 from django.conf import settings
